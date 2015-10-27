@@ -1,0 +1,1 @@
+play{t=Impulse.ar(7)*SinOsc.ar(331);Limiter.ar(GVerb.ar(t,1)*RLPF.ar(LFSaw.ar(333),LFNoise1.kr(2,4,100).midicps))};
