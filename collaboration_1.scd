@@ -8,7 +8,7 @@
 		ToggleFF.ar(cut),
 		[snd, Normalizer.ar(snd * LFPulse.ar(3000), 0.1)]
 	);
-	snd = snd + SinOsc.ar(331 * 1.5 * 2, 0, Trig.ar(cut, 0.01) * 0.03);
+	snd = SinOsc.ar(662 * [1.2, 1.5]) * Trig.ar(cut, 0.01) * 0.03 + snd;
 	Limiter.ar(snd);
 }.play;
 )
