@@ -1,7 +1,8 @@
 (
 {
-  var trig, snd, melody;
-  trig = Impulse.ar(7, 0, LFSaw.kr(1/14, 1)<0.75) * SinOsc.ar(331);
+  var trig, snd, melody, bass, active, ff;
+  active = LFSaw.kr(1/14, 1)<0.75;
+  trig = Impulse.ar(7, 0, active) * SinOsc.ar(331);
   snd = GVerb.ar(trig, 2, 1, spread: 50) * RLPF.ar(LFSaw.ar(333), LFNoise1.kr(2, 4, 100).midicps);
 
   snd = Select.ar(
@@ -20,7 +21,20 @@
   Select.kr(SinOsc.kr(1).range(0, 4),
   [329.63, 493.88, 392.00, 587]),
   0.2), 0.02, 0.02, 4, 4), 0.1, 0.25, 0.25);*/
-
+	
+  // Glen's wonky bass
+  bass = PMOsc.ar(
+    SinOsc.kr(7/24, 0, 12, 52 + LFNoise0.kr(7/6,  4)).round(4).midicps.lag * [1, 1.01],
+    [165, 168.3],
+    SinOsc.kr([1/7, 1/3]).exprange(0.25, 4),
+    0,
+    LFPulse.kr(7/2, [0.5, 0], LFDNoise0.kr(7/32, 0.4, 0.5!2), -15.dbamp)
+  );
+  bass = bass * (LFPulse.kr(8/14, 0, 0.2) + LFPulse.kr(14, 0, 0.7)).clip(0,1).lag;
+  ff = active.lag;
+  bass = BLowShelf.ar(bass, 200, 1, 6) * ff + (1 - ff * HPF.ar(bass, 200, -6.dbamp));
+  bass = CombN.ar(bass.reverse, 1, 3.5/7, 0.75, 0.2, bass);
+  snd = snd + bass;
 
   Limiter.ar(snd);
 
