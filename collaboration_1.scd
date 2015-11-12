@@ -36,6 +36,7 @@
   bass = CombN.ar(bass.reverse, 1, 3.5/7, 0.75, 0.2, bass);
   snd = snd + bass;
 
+  //
   wanderfreq = LFSaw.kr(1/(14*7), 1).exprange(0.05, 3);
   wander = PitchShift.ar(
     snd,
