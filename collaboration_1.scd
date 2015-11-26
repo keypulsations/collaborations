@@ -1,10 +1,11 @@
 (
 {
-  var trig, snd, melody, bass, active, ff, wanderfreq, wander, lead, delay = 1, baseSnd;
+  var trig, snd, melody, bass, active, ff, wanderfreq, wander, lead, delay, baseSnd, env0, env1, env1m, son, bassGate;
+  delay = 0;
   active = LFSaw.kr(1/14, 1)<0.75;
   trig = Impulse.ar(7, 0, active) * SinOsc.ar(331);
-  snd = GVerb.ar(trig, 2, 1, spread: 50) * RLPF.ar(LFSaw.ar(333), LFNoise1.kr(2, 4, 100).midicps);
 
+  snd = GVerb.ar(trig, 2, 1, spread: 50) * RLPF.ar(LFSaw.ar(333), LFNoise1.kr(2, 4, 100).midicps);
   snd = Select.ar(
     SetResetFF.ar(Impulse.ar(7) * SinOsc.ar(11.326)),
     [snd, Compander.ar(snd * LFPulse.ar(3000))]
@@ -15,10 +16,12 @@
   // borrowing from Nathnainiel's melodic idea here
   lead = snd + FreeVerb.ar(
     AllpassC.ar(Ringz.ar(Impulse.ar(7, mul: 0.075),
-      Select.kr(SinOsc.kr(4).range(0, 5), // try different freqs for SinOsc [4, 8, etc.] and max ranges...5, 10, 20
-        [329.63, 493.88, 392.00, 587.33, 659.25]),
+      Select.kr(
+        SinOsc.kr(4).range(0, 5), // try different freqs for SinOsc [4, 8, etc.] and max ranges...5, 10, 20
+        [329.63, 493.88, 392.00, 587.33, 659.25]
+      ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
-  lead = lead * (Sweep.kr(0, 1.0) > (14 * delay)) * 0.7;
+  // lead = lead * (Sweep.kr(0, 1.0) > (14 * delay)) * 0.7;
   snd = snd + lead;
 
   // nice, backseatviolinist. made a few small edits to make it thinner
@@ -51,11 +54,26 @@
     AllpassN.ar(Ringz.ar(Impulse.ar([7/2, 7], [0.5, 0], mul: 0.1),
       Select.kr(
         LFCub.kr(4).range(0, 20),
-        [329.63, 392.00, 493.88, 587.33, 659.25] * 1.5),
-      0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
+        [329.63, 392.00, 493.88, 587.33, 659.25] * 1.5
+      ),
+      0.2
+  ), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   melody = melody * (Sweep.kr(0, 1.0) > (14 * delay * 4)) * 0.7;
   snd = snd + melody;
 
+  // borrowing a kick from rukano: http://sccode.org/1-4Ek
+  bassGate = Impulse.ar(7, 0) * SinOsc.ar(331); // derived from 'active' above
+	env0 =  EnvGen.ar(Env.new([0.5, 1, 0.5, 0], [0.005, 0.06, 0.26], [-4, -2, -4]), gate: bassGate);
+	env1 =  EnvGen.ar(Env.new([110, 59, 29], [0.005, 0.29], [-4, -5]), gate: bassGate);
+	env1m = env1.midicps;
+	son = LFPulse.ar(env1m, 0, 0.5, 1, -0.5);
+	son = son + WhiteNoise.ar(1);
+	son = LPF.ar(son, env1m*1.5, env0);
+	son = son + SinOsc.ar(env1m, 0.5, env0);
+	son = son * 1.2;
+	son = son.clip2(1);
+
+  snd = snd + son;
   Limiter.ar(snd);
 
 }.play;
