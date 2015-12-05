@@ -80,14 +80,14 @@
     ~noise = LFNoise1;
     ~seq   = Dseq([
       Dseq([
-        Dseq([349.23, 331, 493.88, 392.00, 659.25, 739.99, 987.77], 2),
-        Dseq([349.23, 698.46, 349.23], 2),
+        Dseq([349.23, 331, 493.88, 392.00, 659.25, 739.99, 987.77]*2, 2),
+        Dseq([349.23, 698.46, 349.23]*2, 2),
       ], 2),
-      Dseq([1046, 349.23, 1046], 3),
+      Dseq([1046, 349.23, 1046]*2, 3),
     ], inf);
-    ~trigg = Impulse.kr(~seven);
+    ~trigg = Impulse.kr(~seven/2);
     ~freq  = Demand.kr(~trigg, 0, ~seq);
-    ~mel   = SinOsc.ar(~freq, Ndef('x').ar*~noise.ar(0.1).range(1, 3), ~noise.ar(0.1).range(10, 15)).tanh;
+    ~mel   = SinOsc.ar(~freq, Ndef('x').ar*~noise.ar(0.1).range(1, 3), ~noise.ar(0.1).range(5, 10)).tanh;
     // ~mel      = SinOsc.ar(~freq).tanh;
     1.do{~mel = AllpassL.ar(~mel,0.3,{0.2.rand+0.01}!2,5)};
     ~mel.tanh * 0.15;
