@@ -98,7 +98,7 @@
 
   // pad
   ~lfo = LFTri.kr(3.8,Rand(0,2.0)!2);
-  ~seqq = Dseq([329.63, 329.63, 659.25]/4, inf);
+  ~seqq = Dseq([329.63, 329.63, 659.25]/8, inf);
 /*  ~seqq   = Dseq([
     Dseq([
       Dseq([329.63, 329.63, 659.25], 8),
@@ -113,11 +113,11 @@
   ~env = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
   ~sigg = Pan2.ar(~filter*~env,0);
   ~sigg = FreeVerb.ar(~sigg, 0.25, 0.75, 1);
-  ~sigg = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 4)) * 0.7;
+  ~sigg = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * 0.7;
   ~snd = ~snd + ~sigg;
-  // ~snd = ~sigg;
 
   ~snd = ~snd * 0.75;
+  // ~snd = ~drone * 0.5;
 
   Limiter.ar(~snd);
 
