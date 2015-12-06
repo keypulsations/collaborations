@@ -105,17 +105,19 @@
       Dseq([329.63, 783.99, 329.63], 2),
     ], 2),
     Dseq([1046, 329.63, 1046], 3),
-  ], inf);*/
+  // ], inf);*/
   ~triggg = Impulse.kr(~seven/4);
   ~freqq  = Demand.kr(~triggg, 0, ~seqq);
   ~pulse = Mix(Saw.ar(~freqq*[1,1.001]*[1.0,1.0+(0.01*~lfo)]))*0.5;
-  ~filter = BHiPass.ar(~pulse,50,0.15);
+  ~filter = BHiPass.ar(~pulse,100,0.25);
   ~env = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
-  ~sigg = Pan2.ar(~filter*~env*0.75,0);
-  ~sigg = FreeVerb.ar(~sigg, 0.5, 0.75, 0.75);
+  ~sigg = Pan2.ar(~filter*~env,0);
+  ~sigg = FreeVerb.ar(~sigg, 0.25, 0.75, 1);
   ~sigg = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 4)) * 0.7;
   ~snd = ~snd + ~sigg;
   // ~snd = ~sigg;
+
+  ~snd = ~snd * 0.75;
 
   Limiter.ar(~snd);
 
