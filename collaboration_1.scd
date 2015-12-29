@@ -1,5 +1,5 @@
 (
-// next change at 0:45
+// next change at ~0:45
 ~clockFace = ClockFace.new;
 ~clockFace.play;
 {
@@ -24,7 +24,7 @@
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   // ~lead = ~lead * 1.5;
-  ~lead = ~lead * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+  ~lead = ~lead * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   ~snd = ~snd + ~lead;
 
   // nice, backseatviolinist. made a few small edits to make it thinner
@@ -33,7 +33,7 @@
     ~snd,
     0.001,
     Gendy1.kr(1, 1, 1, 1, ~wanderfreq, ~wanderfreq, initCPs: 0).exprange(1, 4),
-    mul: (Sweep.kr(0, 1.0) > (14 * ~delay)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+    mul: (Sweep.kr(0, 1.0) > (14 * ~delay)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   );
   ~snd = ~snd + ~wander;
 
@@ -46,7 +46,7 @@
       ),
       0.2
   ), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
-  ~top = ~top * (Sweep.kr(0, 1.0) > (14 * ~delay)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+  ~top = ~top * (Sweep.kr(0, 1.0) > (14 * ~delay)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   ~top = ~top * 2;
   ~snd = ~snd + ~top;
 
@@ -60,7 +60,7 @@
   );
   ~bass = ~bass * (LFPulse.kr(8/14, 0, 0.25) + LFPulse.kr(14, 0, 0.25)).clip(0,1);
   ~bass = BLowPass.ar(~bass, 200, 1, 6) * ~active + (1 - ~active * HPF.ar(~bass, 200, -6.dbamp));
-  ~bass = ~bass * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+  ~bass = ~bass * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   ~snd = ~snd + ~bass;
 
   // thx jonatan liljedahl
@@ -72,7 +72,13 @@
         Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
-      ], 2),
+      ], 1),
+      Dseq([
+        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 86, 86, 86, 0].midicps, 1),
+      ], 1),
     ], 1);
     ~trigg = Impulse.kr(~seven);
     ~freq  = Demand.kr(~trigg, 0, ~seq);
@@ -95,8 +101,8 @@
         Dseq([65, 64, 68, fall+0, 83, 78, 76, fall+0, 68, 65, 64, 0].midicps * 2, 1),
         Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+2, 83, 78, 76, fall+2, 68, 65, 64, 0].midicps * 2, 1),
-        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
-      ], 2),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1)
+      ], 3),
     ], inf);
     var trig = Impulse.kr(~seven);
     var freq  = Demand.kr(trig, 0, seq);
@@ -106,9 +112,32 @@
     2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melodyHi = ~melodyHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+  ~melodyHi = ~melodyHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   // ~melody = ~melody * XLine.ar(0.25, 1, 12);
   ~snd = ~snd + ~melodyHi;
+
+  // thx jonatan liljedahl
+  ~melodyHi2 = {
+    var fall = 71;
+    var seq   = Dseq([
+      Dseq([
+        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+1, 83, 78, 76, fall+1, 68, 65, 64, 0].midicps * 2, 1),
+        Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, fall+3, 68, 65, 64, 0].midicps * 2, 1)
+      ], 3),
+    ], inf);
+    var trig = Impulse.kr(~seven);
+    var freq  = Demand.kr(trig, 0, seq);
+    var noise = LFNoise1;
+    var mel   = SinOsc.ar(freq, Ndef('x').ar*noise.ar(0.1).range(1, 5), noise.ar(0.5).range(1, 2)).tanh;
+    // ~mel      = SinOsc.ar(~freq).tanh;
+    3.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
+    mel.tanh * 0.25;
+  };
+  ~melodyHi2 = ~melodyHi2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
+  // ~melody = ~melody * XLine.ar(0.25, 1, 12);
+  ~snd = ~snd + ~melodyHi2;
 
 
   // borrowing a kick from rukano: http://sccode.org/1-4Ek
@@ -120,7 +149,7 @@
   ~son      = ~son + WhiteNoise.ar(1);
   ~son      = LPF.ar(~son, ~env1m*1.5, ~env0);
   ~son      = ~son + SinOsc.ar(~env1m, 0.5, ~env0);
-  ~son      = ~son * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+  ~son      = ~son * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   ~son      = ~son * 0.75;
   ~son      = ~son.clip2(1);
   ~snd      = ~snd + ~son;
@@ -136,7 +165,7 @@
   ~sigg   = Pan2.ar(~filter*~env,0);
   // ~sigg   = FreeVerb.ar(~sigg, 0.25, 0.75, 1);
   // ~sigg   = AllpassN.ar(~sigg, 0.1, 0.1);
-  ~sigg   = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 3)) * 0.7;
+  ~sigg   = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   ~snd    = ~snd + ~sigg;
 
   ~leadLow = ~snd + FreeVerb.ar(
@@ -147,11 +176,11 @@
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   // ~lead = ~lead * 1.5;
-  ~leadLow = ~leadLow * (Sweep.kr(0, 1.0) > (14 * ~delay * 3));
+  ~leadLow = ~leadLow * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * 0.7;
   ~snd = ~snd + ~leadLow;
 
 
-  ~snd = ~snd * 0.15;
+  ~snd = ~snd * 0.5;
   Limiter.ar(~snd);
 
 }.play;
