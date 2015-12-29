@@ -68,7 +68,7 @@
     var fall = 71;
     ~seq   = Dseq([
       Dseq([
-        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0, 0].midicps, 1), // extra zero
         Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
@@ -82,9 +82,32 @@
     2.do{~mel = AllpassL.ar(~mel,0.25,{0.2.rand+0.01}!2,5)};
     ~mel.tanh * 0.25;
   };
-  // ~melody = ~melody * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * 0.7;
+  ~melody = ~melody * (Sweep.kr(0, 1.0) < (14 * ~delay * 1)) * 0.7;
   // ~melody = ~melody * XLine.ar(0.25, 1, 12);
   ~snd = ~snd + ~melody;
+
+  // thx jonatan liljedahl
+  ~melodyHi = {
+    var fall = 71;
+    var seq   = Dseq([
+      Dseq([
+        Dseq([65, 64, 68, fall+0, 83, 78, 76, fall+0, 68, 65, 64, 0].midicps * 2, 1),
+        Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+2, 83, 78, 76, fall+2, 68, 65, 64, 0].midicps * 2, 1),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+      ], 2),
+    ], inf);
+    var trig = Impulse.kr(~seven);
+    var freq  = Demand.kr(trig, 0, seq);
+    var noise = LFNoise1;
+    var mel   = SinOsc.ar(freq, Ndef('x').ar*noise.ar(0.1).range(1, 5), noise.ar(0.5).range(1, 2)).tanh;
+    // ~mel      = SinOsc.ar(~freq).tanh;
+    2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
+    mel.tanh * 0.25;
+  };
+  ~melodyHi = ~melodyHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * 0.7;
+  // ~melody = ~melody * XLine.ar(0.25, 1, 12);
+  ~snd = ~snd + ~melodyHi;
 
 
   // borrowing a kick from rukano: http://sccode.org/1-4Ek
