@@ -77,7 +77,7 @@
         Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
         Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
-        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 86, 86, 86, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 86, 86, 86, 0, 0].midicps, 1),
       ], 1),
     ], 1);
     ~trigg = Impulse.kr(~seven);
@@ -132,17 +132,39 @@
     var noise = LFNoise1;
     var mel   = SinOsc.ar(freq, Ndef('x').ar*noise.ar(0.1).range(1, 5), noise.ar(0.5).range(1, 2)).tanh;
     // ~mel      = SinOsc.ar(~freq).tanh;
-    3.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
+    4.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
   ~melodyHi2 = ~melodyHi2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 4)) * 0.7;
   // ~melody = ~melody * XLine.ar(0.25, 1, 12);
   ~snd = ~snd + ~melodyHi2;
 
+  ~melody2 = {
+    var fall = 71;
+    var seq   = Dseq([
+      Dseq([
+        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1), // extra zero
+        Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+      ], 1),
+    ], inf);
+    var trig = Impulse.kr(~seven);
+    var freq  = Demand.kr(trig, 0, seq);
+    var noise = LFNoise1;
+    var mel   = SinOsc.ar(freq, Ndef('x').ar*noise.ar(0.1).range(1, 5), noise.ar(0.5).range(1, 2)).tanh;
+    // ~mel      = SinOsc.ar(~freq).tanh;
+    2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
+    mel.tanh * 0.25;
+  };
+  ~melody2 = ~melody2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 4))* 0.7;
+  // ~melody = ~melody * XLine.ar(0.25, 1, 12);
+  ~snd = ~snd + ~melody2;
+
 
   // borrowing a kick from rukano: http://sccode.org/1-4Ek
   ~kickGate = Impulse.ar(~seven, 0) * SinOsc.ar(100); // derived from '~active' above. try other freqs beside 100 (200, 329.63, 330, etc)
-  ~env0     =  EnvGen.ar(Env.new([0.5, 1, 0.5, 0], [0.005, 0.06, 0.26], [-4, -2, -4]), gate: ~kickGate); // try gate: 0
+  ~env0     =  EnvGen.ar(Env.new([0.5, 1, 0.5, 0], [0.005, 0.06, 0.26], [-4, -2, -4]), gate: 0); // try gate: 0
   ~env1     =  EnvGen.ar(Env.new([110, 59, 29], [0.005, 0.29], [-4, -5]), gate: ~kickGate);
   ~env1m    = ~env1.midicps;
   ~son      = LFPulse.ar(~env1m, 0, 0.5, 1, -0.5);
@@ -171,14 +193,13 @@
   ~leadLow = ~snd + FreeVerb.ar(
     AllpassC.ar(Ringz.ar(Impulse.ar(~seven, mul: 0.075),
       Select.kr(
-        SinOsc.kr(4).range(0, 5), // try different freqs for SinOsc [4, 8, etc.] and max ranges...5, 10, 20
+        SinOsc.kr(4).range(0, 10), // try different freqs for SinOsc [4, 8, etc.] and max ranges...5, 10, 20
         [64, 71, 67, 74, 76].midicps
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   // ~lead = ~lead * 1.5;
   ~leadLow = ~leadLow * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * 0.7;
   ~snd = ~snd + ~leadLow;
-
 
   ~snd = ~snd * 0.5;
   Limiter.ar(~snd);
