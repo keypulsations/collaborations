@@ -1,7 +1,4 @@
-(
-// next change at ~0:45
-~clockFace = ClockFace.new;
-~clockFace.play;
+// (
 {
   ~seven = 7;
   ~delay = 1;
@@ -157,27 +154,6 @@
     2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melody2 = ~melody2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 4))* 0.7;
-  // ~melody = ~melody * XLine.ar(0.25, 1, 12);
-  ~snd = ~snd + ~melody2;
-
-  ~hard = {
-    var fall = 71;
-    var seq   = Dseq([
-      Dseq([
-        Dseq([100, 0, 0, 100, 0, 100, 0].midicps / 2, 3)
-      ], 1),
-    ], inf);
-    var trig  = Impulse.kr(~seven);
-    var freq  = Demand.kr(trig, 0, seq);
-    var noise = LFNoise1;
-    var mel   = SinOsc.ar(freq, Ndef('x').ar*noise.ar(0.1).range(1, 5), noise.ar(0.5).range(1, 2)).tanh;
-    4.do{ mel  = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5) };
-    mel.tanh * 0.25;
-  };
-  ~hard = ~hard * (Sweep.kr(0, 1.0) > (14 * ~delay * 5))* 0.7;
-  ~snd = ~snd + ~hard;
-
 
   // borrowing a kick from rukano: http://sccode.org/1-4Ek
   ~kickGate = Impulse.ar(~seven, 0) * SinOsc.ar(100); // derived from '~active' above. try other freqs beside 100 (200, 329.63, 330, etc)
@@ -226,9 +202,6 @@
 
 
 (
-// next change at ~0:45
-~clockFace = ClockFace.new;
-~clockFace.play;
 {
   ~seven = 7;
   ~delay = 1;
@@ -239,7 +212,7 @@
     SetResetFF.ar(Impulse.ar(~seven) * SinOsc.ar(11.326)),
     [~snd, Compander.ar(~snd * LFPulse.ar(3000))]
   );
-  // ~snd   = ~snd * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * 0.7;
+  ~snd   = ~snd * (Sweep.kr(0, 1.0) < (14 * ~delay * 6)) * 0.7;
   ~baseSnd = ~snd;
 
   ~lead = ~snd + FreeVerb.ar(
@@ -250,7 +223,7 @@
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   // ~lead = ~lead * 1.5;
-  ~lead = ~lead * (Sweep.kr(0, 1.0) > (14 * ~delay * 3));
+  ~lead = ~lead * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5));
   ~snd = ~snd + ~lead;
 
   ~leadLow = ~snd + FreeVerb.ar(
@@ -260,18 +233,17 @@
         [64, 71, 67, 74, 76].midicps
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
+  ~leadLow = ~leadLow * (Sweep.kr(0, 1.0) < (14 * ~delay * 6));
   ~snd = ~snd + ~leadLow;
 
   ~melody2 = {
     var fall = 71;
     var seq   = Dseq([
-      Dseq([
-        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1), // extra zero
-        Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
-        Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
-        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
-      ], 2),
-    ], inf);
+      Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1), // extra zero
+      Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+      Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+      Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+    ], 12);
     var trig = Impulse.kr(~seven);
     var freq  = Demand.kr(trig, 0, seq);
     var noise = LFNoise1;
@@ -280,6 +252,7 @@
     2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
+  ~melody2 = ~melody2 * (Sweep.kr(0, 1.0) < (14 * ~delay * 7));
   ~snd = ~snd + ~melody2;
 
   ~hard = {
@@ -297,7 +270,7 @@
     2.do{ mel  = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5) };
     mel.tanh * 0.25;
   };
-  ~hard = ~hard * (Sweep.kr(0, 1.0) > (14 * ~delay * 1))* 0.7;
+  ~hard = ~hard * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
   ~snd = ~snd + ~hard;
 
   ~hardHi = {
@@ -315,7 +288,7 @@
     3.do{ mel  = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5) };
     mel.tanh * 0.25;
   };
-  ~hardHi = ~hardHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 3))* 0.7;
+  ~hardHi = ~hardHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
   ~snd = ~snd + ~hardHi;
 
 
@@ -338,7 +311,7 @@
     4.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melodyHi = ~melodyHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * 0.7;
+  ~melodyHi = ~melodyHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
   // ~melody = ~melody * XLine.ar(0.25, 1, 12);
   ~snd = ~snd + ~melodyHi;
 
@@ -361,7 +334,7 @@
     4.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melodyHi2 = ~melodyHi2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 3))  * 0.7;
+  ~melodyHi2 = ~melodyHi2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
   // ~melody = ~melody * XLine.ar(0.25, 1, 12);
   ~snd = ~snd + ~melodyHi2;
 
@@ -374,29 +347,24 @@
   ~son      = ~son + WhiteNoise.ar(1);
   ~son      = LPF.ar(~son, ~env1m*1.5, ~env0);
   ~son      = ~son + SinOsc.ar(~env1m, 0.5, ~env0);
-  ~son      = ~son * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * 0.7;
+  ~son      = ~son * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) *  0.7;
   ~son      = ~son * 0.85;
   ~son      = ~son.clip2(1);
   ~snd      = ~snd + ~son;
 
   // bass pad
-
   ~lfo    = LFTri.kr(3.8,Rand(0,2.0)!2);
   ~seqq   = Dseq([65, 64, 76, 64, 64, 65, 64, 76].midicps/8, inf);
   ~triggg = Impulse.kr(~seven);
   ~freqq  = Demand.kr(~triggg, 0, ~seqq);
   ~pulse  = Mix(Saw.ar(~freqq*[1,1.001]*[1.0,1.0+(0.01*~lfo)]))*0.5;
   ~filter = BLowPass.ar(~pulse,100,0.15);
-
   ~highFilter= BHiPass.ar(~pulse,50,0.15);
-
   ~env    = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
   ~sigg   = Pan2.ar(~filter*~env,0);
   ~siggHi = Pan2.ar(~highFilter*~env,0);
   ~sigg   = ~sigg + ~siggHi;
-  // ~sigg   = FreeVerb.ar(~sigg, 0.25, 0.75, 1);
-  // ~sigg   = AllpassN.ar(~sigg, 0.1, 0.1);
-  ~sigg   = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 3));
+  ~sigg   = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5));
   ~snd    = ~snd + ~sigg;
 
   ~snd = ~snd * 0.75;
