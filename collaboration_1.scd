@@ -222,7 +222,7 @@
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   // ~lead = ~lead * 1.5;
-  ~lead = ~lead * ~until.(3) * ~until.(5);
+  ~lead = ~lead * ~from.(3) * ~until.(5);
   ~snd = ~snd + ~lead;
 
   ~leadLow = ~snd + FreeVerb.ar(
