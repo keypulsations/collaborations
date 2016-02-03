@@ -182,6 +182,10 @@
 {
   ~seven = 7;
   ~delay = 1;
+  ~t = Sweep.kr;
+  ~from = { |phrases| ~t > (14 * ~delay * phrases) };
+  ~until = { |phrases| ~t < (14 * ~delay * phrases) };
+
   ~active = LFSaw.kr(1/14, 1)<0.75;
   ~trig = Impulse.ar(~seven, 0, ~active) * SinOsc.ar(329.63);
   ~snd = GVerb.ar(~trig, 2, 1, spread: 50) * RLPF.ar(LFSaw.ar(333), LFNoise1.kr(2, 4, 100).midicps);
@@ -189,7 +193,7 @@
     SetResetFF.ar(Impulse.ar(~seven) * SinOsc.ar(11.326)),
     [~snd, Compander.ar(~snd * LFPulse.ar(3000))]
   );
-  ~snd   = ~snd * (Sweep.kr(0, 1.0) < (14 * ~delay * 6)) * 0.7;
+  ~snd   = ~snd * ~until.(6) * 0.7;
   ~baseSnd = ~snd;
 
   ~lead = ~snd + FreeVerb.ar(
@@ -200,7 +204,7 @@
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
   // ~lead = ~lead * 1.5;
-  ~lead = ~lead * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5));
+  ~lead = ~lead * ~from.(3) * ~until.(5);
   ~snd = ~snd + ~lead;
 
   ~leadLow = ~snd + FreeVerb.ar(
@@ -210,7 +214,7 @@
         [64, 71, 67, 74, 76].midicps
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
-  ~leadLow = ~leadLow * (Sweep.kr(0, 1.0) < (14 * ~delay * 6));
+  ~leadLow = ~leadLow * ~until.(6);
   ~snd = ~snd + ~leadLow;
 
   ~melody2 = {
@@ -229,7 +233,7 @@
     2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melody2 = ~melody2 * (Sweep.kr(0, 1.0) < (14 * ~delay * 6.5));
+  ~melody2 = ~melody2 * ~until.(6.5);
   ~snd = ~snd + ~melody2;
 
   ~hard = {
@@ -247,7 +251,7 @@
     2.do{ mel  = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5) };
     mel.tanh * 0.25;
   };
-  ~hard = ~hard * (Sweep.kr(0, 1.0) > (14 * ~delay * 1)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
+  ~hard = ~hard * ~from.(1) * ~until.(5) * 0.7;
   ~snd = ~snd + ~hard;
 
   ~hardHi = {
@@ -265,7 +269,7 @@
     3.do{ mel  = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5) };
     mel.tanh * 0.25;
   };
-  ~hardHi = ~hardHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
+  ~hardHi = ~hardHi * ~from.(3) * ~until.(5) * 0.7;
   ~snd = ~snd + ~hardHi;
 
 
@@ -287,7 +291,7 @@
     4.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melodyHi = ~melodyHi * (Sweep.kr(0, 1.0) > (14 * ~delay * 2)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
+  ~melodyHi = ~melodyHi * ~from.(2) * ~until.(5) * 0.7;
   ~snd = ~snd + ~melodyHi;
 
   // thx jonatan liljedahl
@@ -309,7 +313,7 @@
     4.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
     mel.tanh * 0.25;
   };
-  ~melodyHi2 = ~melodyHi2 * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) * 0.7;
+  ~melodyHi2 = ~melodyHi2 * ~from.(3) * ~until.(5) * 0.7;
   ~snd = ~snd + ~melodyHi2;
 
   // borrowing a kick from rukano: http://sccode.org/1-4Ek
@@ -321,7 +325,7 @@
   ~son      = ~son + WhiteNoise.ar(1);
   ~son      = LPF.ar(~son, ~env1m*1.5, ~env0);
   ~son      = ~son + SinOsc.ar(~env1m, 0.5, ~env0);
-  ~son      = ~son * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5)) *  0.7;
+  ~son      = ~son * ~from.(3) * ~until.(5) *  0.7;
   ~son      = ~son * 0.85;
   ~son      = ~son.clip2(1);
   ~snd      = ~snd + ~son;
@@ -338,7 +342,7 @@
   ~sigg   = Pan2.ar(~filter*~env,0);
   ~siggHi = Pan2.ar(~highFilter*~env,0);
   ~sigg   = ~sigg + ~siggHi;
-  ~sigg   = ~sigg * (Sweep.kr(0, 1.0) > (14 * ~delay * 3)) * (Sweep.kr(0, 1.0) < (14 * ~delay * 5));
+  ~sigg   = ~sigg * ~from.(3) * ~until.(5);
   ~snd    = ~snd + ~sigg;
 
   ~snd = ~snd * 0.75;
