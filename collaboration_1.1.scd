@@ -132,6 +132,24 @@
   // ~melody = ~melody * XLine.ar(0.25, 1, 12);
   ~snd = ~snd + ~melodyHi2;
 
+  ~melody2 = {
+    var fall = 71;
+    var seq   = Dseq([
+      Dseq([
+        Dseq([65, 64, 68, fall+0, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1), // extra zero
+        Dseq([65, 64, 68, fall+1, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+2, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+        Dseq([65, 64, 68, fall+3, 83, 78, 76, 0, 0, 0, 0, 0].midicps, 1),
+      ], 1),
+    ], inf);
+    var trig = Impulse.kr(~seven);
+    var freq  = Demand.kr(trig, 0, seq);
+    var noise = LFNoise1;
+    var mel   = SinOsc.ar(freq, Ndef('x').ar*noise.ar(0.1).range(1, 5), noise.ar(0.5).range(1, 2)).tanh;
+    // ~mel      = SinOsc.ar(~freq).tanh;
+    2.do{mel = AllpassL.ar(mel,0.25,{0.2.rand+0.01}!2,5)};
+    mel.tanh * 0.25;
+  };
 
   // borrowing a kick from rukano: http://sccode.org/1-4Ek
   ~kickGate = Impulse.ar(~seven, 0) * SinOsc.ar(100); // derived from '~active' above. try other freqs beside 100 (200, 329.63, 330, etc)
