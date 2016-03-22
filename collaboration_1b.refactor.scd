@@ -3,7 +3,7 @@
 var so = Server.local.options;
 so.memSize = 8192 * 8;
 
-SynthDef.new(\a, {
+SynthDef.new(\a, { |gate=1|
 
   var sweeper      = Sweep.kr(0, 1.0), damper = 0.7, noise = LFNoise1;
   var baseBeatFreq = 7, interval = 14;
@@ -186,19 +186,19 @@ SynthDef.new(\a, {
 
 
   ~sigg   = ~sigg * ~from.value(3) * ~to.value(4) * damper;
-  ~out    = ~out   + ~sigg;
+  // ~out    = ~out   + ~sigg;
 
 
   ~out = ~out + 0.75;
 
-  Out.ar(0, Limiter.ar(~out));
+  Out.ar(0, Limiter.ar(~out) * Env.adsr(0,60,0.5,0).kr(2,gate));
 
 }).add;
 )
 
 (
 
-SynthDef.new(\b, {
+SynthDef.new(\b, { |gate=1|
 
   var sweeper      = Sweep.kr(0, 1.0), damper = 0.7, noise = LFNoise1;
   var baseBeatFreq = 7, interval = 14;  // original
@@ -395,7 +395,7 @@ SynthDef.new(\b, {
 
   ~out = ~out * 0.75;
 
-  Out.ar(0, Limiter.ar(~out));
+  Out.ar(0, Limiter.ar(~out) * Env.adsr(0,60,0.5,0).kr(2,gate));
 
 }).add;
 )
@@ -403,3 +403,10 @@ SynthDef.new(\b, {
 
 Synth(\a);
 Synth(\b);
+
+(
+Pseq([
+  (instrument: \a),
+  (instrument: \b)
+], 1).play;
+)
