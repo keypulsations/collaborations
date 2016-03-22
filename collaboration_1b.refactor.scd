@@ -191,7 +191,7 @@ SynthDef.new(\a, { |gate=1|
 
   ~out = ~out + 0.75;
 
-  Out.ar(0, Limiter.ar(~out) * Env.adsr(0,60,0.5,0).kr(2,gate));
+  Out.ar(0, Limiter.ar(~out) * Env.asr(0.1,1,60).kr(2,gate));
 
 }).add;
 )
@@ -395,7 +395,7 @@ SynthDef.new(\b, { |gate=1|
 
   ~out = ~out * 0.75;
 
-  Out.ar(0, Limiter.ar(~out) * Env.adsr(0,60,0.5,0).kr(2,gate));
+  Out.ar(0, Limiter.ar(~out) * Env.asr(0.1,1,60).kr(2,gate));
 
 }).add;
 )
@@ -405,8 +405,10 @@ Synth(\a);
 Synth(\b);
 
 (
-Pseq([
-  (instrument: \a),
-  (instrument: \b)
+Ptpar([
+  // (instrument: \a),
+  // (instrument: \b)
+   0, Pbind(\instrument, \a),
+  60, Pbind(\instrument, \b)
 ], 1).play;
 )
