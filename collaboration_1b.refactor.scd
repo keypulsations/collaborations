@@ -3,9 +3,16 @@
 {
 
   var sweeper      = Sweep.kr(0, 1.0), damper = 0.7, noise = LFNoise1;
-  var baseBeatFreq = 7, interval = 14;
+  var baseBeatFreq = 7, interval = 14;  // original
+
+  // var baseBeatFreq = 1, interval = 2;
+  // var baseBeatFreq = 28, interval = 0.25;
+  // var baseBeatFreq = 14, interval = 0.25;
+  // var baseBeatFreq = 7, interval = 0.25;
+
   var baseTrig     = Impulse.kr(baseBeatFreq);
   var impulseMul   = LFSaw.kr(1/interval, 1) < 0.75;
+  // var impulseMul   = LFSaw.kr(1/interval, 1) < 0.75 + LFSaw.kr(1/4, 1) < 0.75;
   var foundation   = Impulse.ar(baseBeatFreq, 0, impulseMul) * SinOsc.ar(329.63);
   var resetFF      = SetResetFF.ar(Impulse.ar(baseBeatFreq)  * SinOsc.ar(11.326));
 
@@ -25,6 +32,7 @@
 
   ~out  = GVerb.ar(foundation, 2, 1, spread: 50) * RLPF.ar(LFSaw.ar(333), LFNoise1.kr(2, 4, 100).midicps);
   ~out  = Select.ar(resetFF, [~out, Compander.ar(~out * LFPulse.ar(3000))]);
+
   ~out  = ~out * ~to.value(6) * damper;
 
 
@@ -72,7 +80,7 @@
     mel.tanh * 0.25;
   };
   ~melodyMain_ = ~melodyMain_ * ~to.value(6.5);
-  ~out = ~out + ~melodyMain_;
+  ~out         = ~out + ~melodyMain_;
   // MELODYMAIN /////////////////////////////
 
 
@@ -172,20 +180,20 @@
   ~son      = ~son * ~from.value(3) * ~to.value(5) * damper;
   ~out      = ~out + ~son;
 
-  ~lfo    = LFTri.kr(3.8,Rand(0,2.0)!2);
-  ~seqq   = Dseq([65, 67, 76, 65, 65, 67, 65, 76].midicps/8, inf);
-  ~freqq  = Demand.kr(baseTrig, 0, ~seqq);
-  ~pulse  = Mix(Saw.ar(~freqq*[1,1.001]*[1.0,1.0+(0.01*~lfo)]))*0.5;
-  ~filter  = BLowPass.ar(~pulse,100,0.15);
+  ~lfo      = LFTri.kr(3.8,Rand(0,2.0)!2);
+  ~seqq     = Dseq([65, 67, 76, 65, 65, 67, 65, 76].midicps/8, inf);
+  ~freqq    = Demand.kr(baseTrig, 0, ~seqq);
+  ~pulse    = Mix(Saw.ar(~freqq*[1,1.001]*[1.0,1.0+(0.01*~lfo)]))*0.5;
+  ~filter   = BLowPass.ar(~pulse,100,0.15);
 
-  ~highFilter= BHiPass.ar(~pulse,50,0.15);
+  ~highFilter = BHiPass.ar(~pulse,50,0.15);
 
-  ~env    = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
-  ~sigg   = Pan2.ar(~filter*~env,0);
-  ~siggHi = Pan2.ar(~highFilter*~env,0);
-  ~sigg   = ~sigg + ~siggHi;
-  ~sigg   = ~sigg * ~from.value(3) * ~to.value(5);
-  ~out    = ~out + ~sigg;
+  ~env        = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
+  ~sigg       = Pan2.ar(~filter*~env,0);
+  ~siggHi     = Pan2.ar(~highFilter*~env,0);
+  ~sigg       = ~sigg + ~siggHi;
+  ~sigg       = ~sigg * ~from.value(3) * ~to.value(5);
+  ~out        = ~out + ~sigg;
 
   ~out = ~out * 0.75;
   Limiter.ar(~out);
