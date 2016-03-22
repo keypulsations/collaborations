@@ -1,8 +1,5 @@
 (
 
-var so = Server.local.options;
-so.memSize = 8192 * 8;
-
 {
 
   var sweeper      = Sweep.kr(0, 1.0), damper = 0.7, noise = LFNoise1;
@@ -321,19 +318,9 @@ so.memSize = 8192 * 8;
   ~son      = LPF.ar(~son, ~env1*1.5, ~env0);
   ~son      = ~son + SinOsc.ar(~env1, 0.5, ~env0);
   ~son      = ~son * 0.85;
-
   ~son      = ~son.clip2(1);
-  ~son_     = ~son;
-
-
   ~son      = ~son  * ~from.value(1) * ~to.value(4) * damper;
-  ~son_     = ~son_ * ~from.value(7) * ~to.value(9) * damper;
-
-  // ~son_     = ~son_ * ~from.value(3) * ~to.value(9) * damper;
-
   ~out      = ~out + ~son;
-  ~out_     = ~out_ + ~son_;
-
 
 
   ~lfo    = LFTri.kr(3.8,Rand(0,2.0)!2);
@@ -345,35 +332,11 @@ so.memSize = 8192 * 8;
   ~env    = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
   ~sigg   = Pan2.ar(~filter*~env,0);
 
-  ~sigg   = ~sigg * ~from.value(7) * ~to.value(9) * damper;
-  // ~sigg   = ~sigg * ~from.value(3) * ~to.value(9) * damper;
+  // ~sigg   = ~sigg * ~from.value(7) * ~to.value(9) * damper;
   ~out    = ~out   + ~sigg;
-  ~out_   = ~out_ + ~sigg;
 
 
-  ~lfo_    = LFTri.kr(3.8,Rand(0,2.0)!2);
-  ~seqq_   = Dseq([65, 67, 76, 65, 65, 67, 65, 76].midicps/8, inf);
-  ~freqq_  = Demand.kr(baseTrig, 0, ~seqq_);
-  ~pulse_  = Mix(Saw.ar(~freqq_*[1,1.001]*[1.0,1.0+(0.01*~lfo_)]))*0.5;
-  ~filter_ = BLowPass.ar(~pulse_,100,0.15);
-
-  ~highFilter_ = BHiPass.ar(~pulse_,50,0.15);
-
-  ~env_    = EnvGen.ar(Env.adsr(0.1,0.0,1.0,3),1,doneAction:2);
-  ~sigg_   = Pan2.ar(~filter_*~env,0);
-  ~siggHi_ = Pan2.ar(~highFilter_*~env,0);
-  ~sigg_   = ~sigg_ + ~siggHi_;
-  ~sigg_   = ~sigg_ * ~from.value(7) * ~to.value(9);
-
-  // ~sigg_   = ~sigg_ * ~from.value(3) * ~to.value(9) * damper;
-
-  ~out_    = ~out_ + ~sigg_;
-
-
-  ~out  = ~out * ~from.value(0) * ~to.value(4);
-  ~out_  = ~out_ * ~from.value(4) * ~to.value(9);
-
-  ~out = ~out + ~out_ * 0.75;
+  ~out = ~out + 0.75;
 
   Limiter.ar(~out);
 
