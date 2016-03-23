@@ -28,7 +28,7 @@ SynthDef.new(\a, { |gate=1|
 
   ~out = GVerb.ar(foundation, 2, 1, spread: 50) * RLPF.ar(LFSaw.ar(333), LFNoise1.kr(2, 4, 100).midicps);
   ~out = Select.ar(resetFF, [~out, Compander.ar(~out * LFPulse.ar(3000))]);
-  ~out = ~out* ~from.value(1) * damper;
+  ~out = ~out* ~from.value(1) * ~to.value(4) * damper;
 
   // TOP ////////////////////////////////////
   ~top = ~out + FreeVerb.ar(
@@ -191,7 +191,8 @@ SynthDef.new(\a, { |gate=1|
 
   ~out = ~out + 0.75;
 
-  Out.ar(0, Limiter.ar(~out) * Env.asr(0.1,1,60).kr(2,gate));
+  // Out.ar(0, Limiter.ar(~out) * Env.asr(0.1,1,0.5).kr(2,gate));
+  Out.ar(0, Limiter.ar(~out));
 
 }).add;
 )
@@ -243,7 +244,7 @@ SynthDef.new(\b, { |gate=1|
         cubMel * 2
       ),
       0.2), 0.02, 0.02, 4, 4), 0.1, 0.5, 0.5);
-  ~leadHigh_ = ~leadHigh_ * ~from.value(3) * ~to.value(5) * damper;
+  ~leadHigh_ = ~leadHigh_ * ~from.value(3) * ~to.value(5) * damper * 0.5;
   ~out = ~out + ~leadHigh_;
   // LEAD ///////////////////////////////////
 
@@ -395,7 +396,8 @@ SynthDef.new(\b, { |gate=1|
 
   ~out = ~out * 0.75;
 
-  Out.ar(0, Limiter.ar(~out) * Env.asr(0.1,1,60).kr(2,gate));
+  // Out.ar(0, Limiter.ar(~out) * Env.asr(0.1,1,0.5).kr(2,gate));
+  Out.ar(0, Limiter.ar(~out));
 
 }).add;
 )
@@ -405,10 +407,12 @@ Synth(\a);
 Synth(\b);
 
 (
-Ptpar([
-  // (instrument: \a),
-  // (instrument: \b)
-   0, Pbind(\instrument, \a),
-  60, Pbind(\instrument, \b)
+
+var clock = ClockFace.new;
+clock.play;
+
+Pseq([
+  (instrument: \a, dur: 56),
+  (instrument: \b, dur: 56)
 ], 1).play;
 )
